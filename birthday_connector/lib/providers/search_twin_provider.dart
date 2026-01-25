@@ -59,11 +59,10 @@ class BirthdayTwinsNotifier extends Notifier<BirthdayTwinsState> {
               return null;
             }
           })
-          .whereType<BirthdayTwin>() 
+          .whereType<BirthdayTwin>()
           .toList();
 
       state = state.copyWith(twins: twins, isLoading: false);
-      
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -95,7 +94,6 @@ class BirthdayTwinsNotifier extends Notifier<BirthdayTwinsState> {
           .toList();
 
       state = state.copyWith(twins: twins, isLoading: false);
-      
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

@@ -1,6 +1,6 @@
 class HistoricalEvent {
   final int id;
-  final DateTime eventDate; 
+  final DateTime eventDate;
   final String title;
   final String description;
   final String category;

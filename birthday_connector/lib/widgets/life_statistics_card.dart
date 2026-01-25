@@ -49,7 +49,7 @@ class _LifeStatisticsCardState extends State<LifeStatisticsCard> {
   int get _heartbeats => (_secondsLived * 1.2).toInt(); // ~72 bpm average
   int get _breathsTaken => (_secondsLived * 0.25).toInt(); // ~15 breaths/min
   double get _distanceWalked =>
-      (_daysLived * 7500 * 0.762) / 1000; // ~7500 steps/day * 0.762m/step
+      (_daysLived * 7500 * 0.7) / 1000; // ~7500 steps/day * 0.7m/step
 
   @override
   Widget build(BuildContext context) {
@@ -74,11 +74,12 @@ class _LifeStatisticsCardState extends State<LifeStatisticsCard> {
                     const SizedBox(width: 12),
                     Text(
                       'Life Statistics',
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.primary
-                              ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary),
                     ),
                   ],
                 ),

@@ -47,9 +47,9 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
 
     if (success) {
       await ref.read(lettersProvider.notifier).loadLetters();
-      
+
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -59,7 +59,9 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      Navigator.of(context)..pop()..pop();
+      Navigator.of(context)
+        ..pop()
+        ..pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -108,7 +110,7 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: colorScheme.onSurface,                            
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
@@ -125,9 +127,7 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
             TextFormField(
               style: TextStyle(
                 color: colorScheme.onSurface,
@@ -146,9 +146,7 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
                 return null;
               },
             ),
-
             const SizedBox(height: 16),
-
             TextFormField(
               style: TextStyle(
                 color: colorScheme.onSurface,
@@ -171,9 +169,7 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
                 return null;
               },
             ),
-
             const SizedBox(height: 24),
-
             Text(
               'Delivery Delay',
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
@@ -189,7 +185,6 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
               ),
             ),
             const SizedBox(height: 12),
-
             SegmentedButton<int>(
               segments: const [
                 ButtonSegment(
@@ -205,7 +200,6 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
                 });
               },
             ),
-
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
@@ -233,9 +227,7 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 32),
-
             FilledButton.icon(
               onPressed: _isSending ? null : _sendLetter,
               icon: _isSending

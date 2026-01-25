@@ -37,20 +37,19 @@ class Letter {
       sentAt: DateTime.parse(json['sent_at'] as String),
       canOpenAt: DateTime.parse(json['can_open_at'] as String),
       isOpened: json['is_opened'] as bool? ?? false,
-      openedAt: json['opened_at'] != null 
-          ? DateTime.parse(json['opened_at'] as String) 
+      openedAt: json['opened_at'] != null
+          ? DateTime.parse(json['opened_at'] as String)
           : null,
-      sender: json['sender'] != null 
-          ? UserProfile.fromJson(json['sender']) 
-          : null,
-      recipient: json['recipient'] != null 
-          ? UserProfile.fromJson(json['recipient']) 
+      sender:
+          json['sender'] != null ? UserProfile.fromJson(json['sender']) : null,
+      recipient: json['recipient'] != null
+          ? UserProfile.fromJson(json['recipient'])
           : null,
     );
   }
 
   bool get canBeOpened => DateTime.now().isAfter(canOpenAt);
-  
+
   Duration get timeUntilCanOpen {
     if (canBeOpened) return Duration.zero;
     return canOpenAt.difference(DateTime.now());

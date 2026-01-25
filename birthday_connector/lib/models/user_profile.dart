@@ -33,9 +33,9 @@ class UserProfile {
   }
 
   static DateTime _parseDateTime(dynamic value) {
-    if (value == null) return DateTime.now(); 
+    if (value == null) return DateTime.now();
 
-    if (value is DateTime) return value; 
+    if (value is DateTime) return value;
 
     if (value is String) {
       try {

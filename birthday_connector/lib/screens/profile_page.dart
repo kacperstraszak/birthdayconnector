@@ -51,12 +51,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Future<void> _saveProfile() async {
     final notifier = ref.read(profileProvider.notifier);
     FocusScope.of(context).unfocus();
-    
+
     print('Saving profile...');
     print('Bio: "${_bioController.text}"');
     print('Interests: "${_interestsController.text}"');
     print('Question: "${_questionController.text}"');
-    
+
     await notifier.updateProfile(
       bio: _bioController.text,
       interests: _interestsController.text,
@@ -72,7 +72,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         SnackBar(
           content: Text(
             'Profile updated successfully!',
-            style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface),
           ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).colorScheme.inverseSurface,
@@ -110,7 +111,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     final birthDate = profile?.birthDate ??
         (authState.user?.userMetadata?['birth_date'] != null
-            ? DateTime.tryParse(authState.user!.userMetadata!['birth_date'].toString()) ?? DateTime.now()
+            ? DateTime.tryParse(
+                    authState.user!.userMetadata!['birth_date'].toString()) ??
+                DateTime.now()
             : DateTime.now());
 
     return Scaffold(
@@ -118,7 +121,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         onRefresh: () async {
           final userId = authState.user?.id;
           if (userId != null) {
-            _hasLoadedData = false; 
+            _hasLoadedData = false;
             await ref.read(profileProvider.notifier).loadProfile(userId);
           }
         },
@@ -139,7 +142,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           radius: 50,
                           backgroundColor: colorScheme.primaryContainer,
                           child: Text(
-                            username.isNotEmpty ? username[0].toUpperCase() : '?',
+                            username.isNotEmpty
+                                ? username[0].toUpperCase()
+                                : '?',
                             style: TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.bold,
@@ -152,7 +157,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       Center(
                         child: Text(
                           username,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: colorScheme.onSurface,
                               ),
@@ -170,9 +178,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           const SizedBox(width: 8),
                           Text(
                             'Born: ${birthDate.day}.${birthDate.month}.${birthDate.year}',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                           ),
                         ],
                       ),
@@ -181,7 +190,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 24),
-
               Card(
                 elevation: 2,
                 child: Padding(
@@ -198,7 +206,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           const SizedBox(width: 12),
                           Text(
                             'Edit Profile',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: colorScheme.onSurface,
                                 ),
@@ -206,13 +217,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ],
                       ),
                       const Divider(height: 32),
-                      
                       Text(
                         'About Me',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
                       ),
                       const SizedBox(height: 8),
                       TextField(
@@ -222,19 +233,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         style: TextStyle(color: colorScheme.onSurface),
                         decoration: InputDecoration(
                           hintText: 'Tell others about yourself...',
-                          hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                          hintStyle:
+                              TextStyle(color: colorScheme.onSurfaceVariant),
                           border: const OutlineInputBorder(),
                           contentPadding: const EdgeInsets.all(12),
                         ),
                       ),
                       const SizedBox(height: 16),
-
                       Text(
                         'Interests',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
                       ),
                       const SizedBox(height: 8),
                       TextField(
@@ -243,19 +255,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         style: TextStyle(color: colorScheme.onSurface),
                         decoration: InputDecoration(
                           hintText: 'e.g., Music, Sports, Reading...',
-                          hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                          hintStyle:
+                              TextStyle(color: colorScheme.onSurfaceVariant),
                           border: const OutlineInputBorder(),
                           contentPadding: const EdgeInsets.all(12),
                         ),
                       ),
                       const SizedBox(height: 16),
-
                       Text(
                         'Ice Breaker Question',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -271,21 +284,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         maxLength: 150,
                         style: TextStyle(color: colorScheme.onSurface),
                         decoration: InputDecoration(
-                          hintText: 'e.g., What\'s your favorite childhood memory?',
-                          hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                          hintText:
+                              'e.g., What\'s your favorite childhood memory?',
+                          hintStyle:
+                              TextStyle(color: colorScheme.onSurfaceVariant),
                           border: const OutlineInputBorder(),
                           contentPadding: const EdgeInsets.all(12),
                         ),
                       ),
                       const SizedBox(height: 24),
-
                       FilledButton.icon(
                         onPressed: profileState.isLoading ? null : _saveProfile,
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 48),
                         ),
-                        icon: profileState.isLoading 
-                            ? const SizedBox.shrink() 
+                        icon: profileState.isLoading
+                            ? const SizedBox.shrink()
                             : const Icon(Icons.save),
                         label: profileState.isLoading
                             ? SizedBox(

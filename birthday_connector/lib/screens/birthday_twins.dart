@@ -29,7 +29,7 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
       await ref
           .read(birthdayTwinsProvider.notifier)
           .loadMyBirthdayTwins(profile.birthDate);
-      
+
       final state = ref.read(birthdayTwinsProvider);
       if (state.errorMessage != null) {
         print('RPC failed, trying direct query...');
@@ -103,9 +103,7 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
                 ],
               ),
             ),
-
           const Divider(height: 1),
-
           Expanded(
             child: _buildTwinsList(twinsState, colorScheme),
           ),

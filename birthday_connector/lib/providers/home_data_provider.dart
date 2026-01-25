@@ -52,7 +52,7 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
 
   Future<void> loadDataForDate(DateTime date, {int limit = 5}) async {
     final normalizedDate = DateTime(date.year, date.month, date.day);
-    
+
     if (state.loadedForDate != null) {
       final loadedDate = DateTime(
         state.loadedForDate!.year,
@@ -174,7 +174,6 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
   }
 }
 
-final homeDataProvider =
-    NotifierProvider<HomeDataNotifier, HomeDataState>(
+final homeDataProvider = NotifierProvider<HomeDataNotifier, HomeDataState>(
   HomeDataNotifier.new,
 );

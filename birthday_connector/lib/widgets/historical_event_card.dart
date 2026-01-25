@@ -15,7 +15,6 @@ class HistoricalEventCard extends StatelessWidget {
     return formatted.toUpperCase();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -37,7 +36,6 @@ class HistoricalEventCard extends StatelessWidget {
     return Column(
       children: events.map((event) {
         final yearsAgo = DateTime.now().year - event.year;
-        
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -52,7 +50,7 @@ class HistoricalEventCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.greenAccent.withValues(alpha: 0.2), 
+                        color: Colors.greenAccent.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -76,7 +74,7 @@ class HistoricalEventCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _formatText(event.title), 
+                  _formatText(event.title),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,

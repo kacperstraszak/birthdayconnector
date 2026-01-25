@@ -1,10 +1,9 @@
-import 'package:birthday_connector/models/letter.dart';
 import 'package:birthday_connector/providers/messages_provider.dart';
 import 'package:birthday_connector/screens/birthday_twins.dart';
 import 'package:birthday_connector/screens/letter_detail.dart';
+import 'package:birthday_connector/widgets/letter_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class MessagesPage extends ConsumerStatefulWidget {
   const MessagesPage({super.key});
@@ -119,9 +118,9 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
           await ref.read(lettersProvider.notifier).loadLetters();
         },
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(), 
+          physics: const AlwaysScrollableScrollPhysics(),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6, 
+            height: MediaQuery.of(context).size.height * 0.6,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -170,7 +169,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
         itemCount: state.receivedLetters.length,
         itemBuilder: (context, index) {
           final letter = state.receivedLetters[index];
-          return _LetterCard(
+          return LetterCard(
             letter: letter,
             isReceived: true,
             onTap: () {
@@ -201,7 +200,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
           await ref.read(lettersProvider.notifier).loadLetters();
         },
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(), 
+          physics: const AlwaysScrollableScrollPhysics(),
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Center(
@@ -252,7 +251,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
         itemCount: state.sentLetters.length,
         itemBuilder: (context, index) {
           final letter = state.sentLetters[index];
-          return _LetterCard(
+          return LetterCard(
             letter: letter,
             isReceived: false,
             onTap: () {
@@ -313,230 +312,5 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
         ),
       ),
     );
-  }
-}
-
-class _LetterCard extends StatelessWidget {
-  final Letter letter;
-  final bool isReceived;
-  final VoidCallback onTap;
-
-  const _LetterCard({
-    required this.letter,
-    required this.isReceived,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final otherUser = isReceived ? letter.sender : letter.recipient;
-    final canOpen = letter.canBeOpened;
-    final isUnread = isReceived && !letter.isOpened && canOpen;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: isUnread ? 4 : 1,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isUnread
-                          ? colorScheme.primaryContainer
-                          : colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      letter.isOpened ? Icons.mail_outline : Icons.mail,
-                      color: isUnread
-                          ? colorScheme.onPrimaryContainer
-                          : colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                letter.subject,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: isUnread
-                                      ? FontWeight.bold
-                                      : FontWeight.w600,
-                                  color: colorScheme.onSurface,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (isUnread)
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primary,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${isReceived ? 'From' : 'To'}: ${otherUser?.username ?? 'Unknown'}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          DateFormat.yMMMd().add_jm().format(letter.sentAt),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              if (isReceived) ...[
-                const SizedBox(height: 12),
-                _LetterStatusBanner(letter: letter),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LetterStatusBanner extends StatefulWidget {
-  final Letter letter;
-
-  const _LetterStatusBanner({required this.letter});
-
-  @override
-  State<_LetterStatusBanner> createState() => _LetterStatusBannerState();
-}
-
-class _LetterStatusBannerState extends State<_LetterStatusBanner> {
-  @override
-  void initState() {
-    super.initState();
-    if (!widget.letter.canBeOpened) {
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) setState(() {});
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    if (widget.letter.isOpened) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.check_circle, size: 16, color: colorScheme.primary),
-            const SizedBox(width: 8),
-            Text(
-              'Opened ${_formatTimeAgo(widget.letter.openedAt!)}',
-              style: TextStyle(
-                fontSize: 12,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (widget.letter.canBeOpened) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.lock_open,
-                size: 16, color: colorScheme.onPrimaryContainer),
-            const SizedBox(width: 8),
-            Text(
-              'Ready to open!',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onPrimaryContainer,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final timeLeft = widget.letter.timeUntilCanOpen;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.lock_clock,
-              size: 16, color: colorScheme.onSecondaryContainer),
-          const SizedBox(width: 8),
-          Text(
-            'Opens in ${_formatDuration(timeLeft)}',
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSecondaryContainer,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    if (duration.inHours > 0) {
-      return '${duration.inHours}h ${duration.inMinutes.remainder(60)}m';
-    }
-    return '${duration.inMinutes}m';
-  }
-
-  String _formatTimeAgo(DateTime time) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inDays > 0) return '${diff.inDays}d ago';
-    if (diff.inHours > 0) return '${diff.inHours}h ago';
-    if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
-    return 'just now';
   }
 }

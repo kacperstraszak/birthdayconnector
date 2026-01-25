@@ -26,7 +26,9 @@ class BirthdayTwin {
       bio: json['bio'] as String?,
       interests: json['interests'] as String?,
       avatarUrl: json['avatar_url'] as String?,
-      age: json['age'] is int ? json['age'] : int.tryParse(json['age'].toString()) ?? 0,
+      age: json['age'] is int
+          ? json['age']
+          : int.tryParse(json['age'].toString()) ?? 0,
       iceBreakerQuestion: json['ice_breaker_question'] as String?,
     );
   }
@@ -35,8 +37,8 @@ class BirthdayTwin {
     return UserProfile(
       id: id,
       username: username,
-      email: '', 
-      birthDate: DateTime.now(), 
+      email: '',
+      birthDate: DateTime.now(),
       bio: bio,
       interests: interests,
       iceBreakerQuestion: iceBreakerQuestion,

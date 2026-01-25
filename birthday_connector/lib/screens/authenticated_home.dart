@@ -1,5 +1,5 @@
 import 'package:birthday_connector/providers/auth_provider.dart';
-import 'package:birthday_connector/providers/home_data_provider.dart'; 
+import 'package:birthday_connector/providers/home_data_provider.dart';
 import 'package:birthday_connector/providers/profile_provider.dart';
 import 'package:birthday_connector/screens/home_page.dart';
 import 'package:birthday_connector/screens/messages_page.dart';
@@ -26,10 +26,10 @@ class _AuthenticatedHomeScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authState = ref.read(authProvider);
       final userId = authState.user?.id;
-      
+
       if (userId != null) {
         ref.read(profileProvider.notifier).loadProfile(userId);
-        
+
         final userDate = authState.profile?.birthDate ?? DateTime.now();
         ref.read(homeDataProvider.notifier).loadDataForDate(userDate);
       }

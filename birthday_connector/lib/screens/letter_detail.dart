@@ -49,7 +49,8 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
 
     setState(() => _isOpening = true);
 
-    final success = await ref.read(lettersProvider.notifier).openLetter(widget.letter.id);
+    final success =
+        await ref.read(lettersProvider.notifier).openLetter(widget.letter.id);
 
     if (success && mounted) {
       setState(() {
@@ -57,7 +58,7 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
         _isOpening = false;
       });
       _controller.forward();
-      
+
       ref.read(lettersProvider.notifier).loadLetters();
     } else if (mounted) {
       setState(() => _isOpening = false);
@@ -75,11 +76,14 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
     final colorScheme = Theme.of(context).colorScheme;
     final currentUserId = ref.watch(authProvider).user?.id;
     final isReceived = widget.letter.recipientId == currentUserId;
-    final otherUser = isReceived ? widget.letter.sender : widget.letter.recipient;
+    final otherUser =
+        isReceived ? widget.letter.sender : widget.letter.recipient;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isReceived ? 'Letter from ${otherUser?.username}' : 'Letter to ${otherUser?.username}'),
+        title: Text(isReceived
+            ? 'Letter from ${otherUser?.username}'
+            : 'Letter to ${otherUser?.username}'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -122,18 +126,17 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
                     'Sent ${DateFormat.yMMMd().add_jm().format(widget.letter.sentAt)}',
                     style: TextStyle(
                       fontSize: 14,
-                      color: colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                      color:
+                          colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
               ),
             ),
-
             if (isReceived && !_hasOpened) ...[
               const SizedBox(height: 24),
               _buildStatusSection(colorScheme),
             ],
-
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.all(24),
@@ -366,7 +369,7 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
-    
+
     if (hours > 0) {
       return '$hours hour${hours != 1 ? 's' : ''} ${minutes}min';
     }

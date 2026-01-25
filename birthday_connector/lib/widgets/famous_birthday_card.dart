@@ -9,18 +9,18 @@ class FamousBirthdayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     final age = DateTime.now().year - birthday.birthDate.year;
 
     return Card(
-      elevation: 2, 
+      elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: colorScheme.primaryContainer,
           child: Text(
-            birthday.displayName.isNotEmpty 
-                ? birthday.displayName.substring(0, 1).toUpperCase() 
+            birthday.displayName.isNotEmpty
+                ? birthday.displayName.substring(0, 1).toUpperCase()
                 : '?',
             style: TextStyle(
               color: colorScheme.onPrimaryContainer,
@@ -50,7 +50,7 @@ class FamousBirthdayCard extends StatelessWidget {
               '$age years old',
               style: TextStyle(
                 fontSize: 12,
-                color: colorScheme.onSurfaceVariant, 
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],

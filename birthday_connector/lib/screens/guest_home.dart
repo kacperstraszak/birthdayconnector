@@ -92,7 +92,6 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                 ],
               ),
             ),
-
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               elevation: 2,
@@ -154,14 +153,11 @@ class _GuestHomeScreenState extends State<GuestHomeScreen> {
                 ),
               ),
             ),
-
             LifeStatisticsCard(
               birthDate: _selectedDate,
               showDatePicker: false,
             ),
-
             const SizedBox(height: 16),
-
             Card(
               margin: const EdgeInsets.all(16),
               elevation: 2,

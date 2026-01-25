@@ -49,7 +49,7 @@ class ProfileNotifier extends Notifier<ProfileState> {
           .from(kProfilesTable)
           .select()
           .eq('id', userId)
-          .maybeSingle(); 
+          .maybeSingle();
 
       if (response == null) {
         state = state.copyWith(isLoading: false);
@@ -111,10 +111,12 @@ class ProfileNotifier extends Notifier<ProfileState> {
       final updates = <String, dynamic>{};
 
       updates['bio'] = bio?.trim().isEmpty ?? true ? null : bio!.trim();
-      updates['interests'] = interests?.trim().isEmpty ?? true ? null : interests!.trim();
-      updates['ice_breaker_question'] = 
-          iceBreakerQuestion?.trim().isEmpty ?? true ? null : iceBreakerQuestion!.trim();
-
+      updates['interests'] =
+          interests?.trim().isEmpty ?? true ? null : interests!.trim();
+      updates['ice_breaker_question'] =
+          iceBreakerQuestion?.trim().isEmpty ?? true
+              ? null
+              : iceBreakerQuestion!.trim();
 
       final response = await _supabase
           .from(kProfilesTable)
@@ -123,10 +125,8 @@ class ProfileNotifier extends Notifier<ProfileState> {
           .select()
           .single();
 
-
       final updatedProfile = UserProfile.fromJson(response);
       state = state.copyWith(profile: updatedProfile, isLoading: false);
-      
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -152,8 +152,7 @@ class ProfileNotifier extends Notifier<ProfileState> {
           .toList();
 
       state = state.copyWith(birthdayTwins: twins);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 }
 

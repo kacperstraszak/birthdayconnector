@@ -1,10 +1,12 @@
 import 'package:birthday_connector/providers/auth_provider.dart';
 import 'package:birthday_connector/providers/home_data_provider.dart';
 import 'package:birthday_connector/providers/profile_provider.dart';
+import 'package:birthday_connector/widgets/birthday_countdown.dart';
 import 'package:birthday_connector/widgets/countdown_card.dart';
 import 'package:birthday_connector/widgets/famous_birthday_card.dart';
 import 'package:birthday_connector/widgets/historical_event_card.dart';
 import 'package:birthday_connector/widgets/life_statistics_card.dart';
+import 'package:birthday_connector/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,7 +23,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final profileState = ref.watch(profileProvider);
     final authState = ref.watch(authProvider);
     final homeDataState = ref.watch(homeDataProvider);
-    final colorScheme = Theme.of(context).colorScheme; 
+    final colorScheme = Theme.of(context).colorScheme;
 
     final birthDate = profileState.profile?.birthDate;
 
@@ -54,7 +56,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               },
               child: Text(
                 'Retry',
-                style: TextStyle(color: colorScheme.primary), 
+                style: TextStyle(color: colorScheme.primary),
               ),
             ),
           ],
@@ -85,11 +87,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(child: BirthdayCountdownCard(birthDate: birthDate)),
+            const SizedBox(height: 24),
             LifeStatisticsCard(birthDate: birthDate),
             const SizedBox(height: 24),
-            
             if (homeDataState.countdownEvents.isNotEmpty) ...[
-              const _SectionHeader(
+              const SectionHeader(
                 title: 'Upcoming Events',
                 icon: Icons.schedule,
               ),
@@ -102,9 +105,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               const SizedBox(height: 24),
             ],
-
             if (homeDataState.famousBirthdays.isNotEmpty) ...[
-              const _SectionHeader(
+              const SectionHeader(
                 title: 'Born on Your Birthday',
                 icon: Icons.cake,
               ),
@@ -117,17 +119,15 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               const SizedBox(height: 24),
             ],
-
             if (homeDataState.historicalEvents.isNotEmpty) ...[
-              const _SectionHeader(
-                title: 'Historical Events on Your Birthday',
+              const SectionHeader(
+                title: 'Events on Your Birthday',
                 icon: Icons.history_edu,
               ),
               const SizedBox(height: 12),
               HistoricalEventCard(events: homeDataState.historicalEvents),
               const SizedBox(height: 24),
             ],
-
             if (homeDataState.isLoading)
               const Center(
                 child: Padding(
@@ -135,7 +135,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: CircularProgressIndicator(),
                 ),
               ),
-
             if (homeDataState.errorMessage != null)
               Card(
                 color: colorScheme.errorContainer,
@@ -163,39 +162,6 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final IconData icon;
-
-  const _SectionHeader({
-    required this.title,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 24,
-          color: colorScheme.primary,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface, 
-              ),
-        ),
-      ],
     );
   }
 }

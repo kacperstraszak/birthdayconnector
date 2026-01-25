@@ -162,8 +162,7 @@ class AuthNotifier extends Notifier<AuthState> {
         kUserIdCol: user.id,
         kUsernameCol: username.trim(),
         kEmailCol: email,
-        kBirthDateCol:
-            formattedDate.toIso8601String().split('T')[0],
+        kBirthDateCol: formattedDate.toIso8601String().split('T')[0],
       });
 
       state = state.copyWith(

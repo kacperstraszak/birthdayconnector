@@ -98,7 +98,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   right: 20,
                 ),
                 width: 200,
-                child: Image.asset('assets/images/panda.png'),
+                child: Image.asset('assets/images/balloons.png'),
               ),
               Card(
                 margin: const EdgeInsets.all(20),
@@ -319,8 +319,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               onPressed: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        const GuestHomeScreen(),
+                                    builder: (_) => const GuestHomeScreen(),
                                   ),
                                 );
                               },
