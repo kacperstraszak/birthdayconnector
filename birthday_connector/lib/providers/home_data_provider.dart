@@ -10,6 +10,7 @@ class HomeDataState {
   final List<CountdownEvent> countdownEvents;
   final bool isLoading;
   final String? errorMessage;
+  final DateTime? loadedForDate;
 
   HomeDataState({
     this.famousBirthdays = const [],
@@ -17,6 +18,7 @@ class HomeDataState {
     this.countdownEvents = const [],
     this.isLoading = false,
     this.errorMessage,
+    this.loadedForDate,
   });
 
   HomeDataState copyWith({
@@ -25,13 +27,16 @@ class HomeDataState {
     List<CountdownEvent>? countdownEvents,
     bool? isLoading,
     String? errorMessage,
+    DateTime? loadedForDate,
+    bool clearError = false,
   }) {
     return HomeDataState(
       famousBirthdays: famousBirthdays ?? this.famousBirthdays,
       historicalEvents: historicalEvents ?? this.historicalEvents,
       countdownEvents: countdownEvents ?? this.countdownEvents,
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      loadedForDate: loadedForDate ?? this.loadedForDate,
     );
   }
 }
@@ -46,11 +51,24 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
   }
 
   Future<void> loadDataForDate(DateTime date, {int limit = 5}) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    final normalizedDate = DateTime(date.year, date.month, date.day);
+    
+    if (state.loadedForDate != null) {
+      final loadedDate = DateTime(
+        state.loadedForDate!.year,
+        state.loadedForDate!.month,
+        state.loadedForDate!.day,
+      );
+      if (loadedDate == normalizedDate && !state.isLoading) {
+        return;
+      }
+    }
+
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final month = date.month;
-      final day = date.day;
+      final month = normalizedDate.month;
+      final day = normalizedDate.day;
 
       List<FamousBirthday> birthdays = [];
       try {
@@ -63,11 +81,20 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
           },
         );
 
-        birthdays = (birthdaysResponse as List)
-            .map((json) => FamousBirthday.fromJson(json))
-            .toList();
+        if (birthdaysResponse != null && birthdaysResponse is List) {
+          birthdays = (birthdaysResponse as List)
+              .map((json) {
+                try {
+                  return FamousBirthday.fromJson(json);
+                } catch (e) {
+                  return null;
+                }
+              })
+              .whereType<FamousBirthday>()
+              .toList();
+        }
       } catch (e) {
-        print('Error loading birthdays: $e');
+        // Ignore error
       }
 
       List<HistoricalEvent> events = [];
@@ -81,11 +108,20 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
           },
         );
 
-        events = (eventsResponse as List)
-            .map((json) => HistoricalEvent.fromJson(json))
-            .toList();
+        if (eventsResponse != null && eventsResponse is List) {
+          events = (eventsResponse as List)
+              .map((json) {
+                try {
+                  return HistoricalEvent.fromJson(json);
+                } catch (e) {
+                  return null;
+                }
+              })
+              .whereType<HistoricalEvent>()
+              .toList();
+        }
       } catch (e) {
-        print('Error loading events: $e');
+        // Ignore error
       }
 
       List<CountdownEvent> countdowns = [];
@@ -95,13 +131,22 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
             .select()
             .gte('event_date', DateTime.now().toIso8601String())
             .order('event_date', ascending: true)
-            .limit(3);
+            .limit(limit);
 
-        countdowns = (countdownResponse as List)
-            .map((json) => CountdownEvent.fromJson(json))
-            .toList();
+        if (countdownResponse != null && countdownResponse is List) {
+          countdowns = (countdownResponse as List)
+              .map((json) {
+                try {
+                  return CountdownEvent.fromJson(json);
+                } catch (e) {
+                  return null;
+                }
+              })
+              .whereType<CountdownEvent>()
+              .toList();
+        }
       } catch (e) {
-        print('Error loading countdowns: $e');
+        // Ignore error
       }
 
       state = state.copyWith(
@@ -109,6 +154,7 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
         historicalEvents: events,
         countdownEvents: countdowns,
         isLoading: false,
+        loadedForDate: normalizedDate,
       );
     } catch (e) {
       state = state.copyWith(
@@ -117,8 +163,16 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
       );
     }
   }
-}
 
+  Future<void> forceReload(DateTime date, {int limit = 5}) async {
+    state = state.copyWith(loadedForDate: null);
+    await loadDataForDate(date, limit: limit);
+  }
+
+  void clearData() {
+    state = HomeDataState();
+  }
+}
 
 final homeDataProvider =
     NotifierProvider<HomeDataNotifier, HomeDataState>(

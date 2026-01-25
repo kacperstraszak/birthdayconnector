@@ -58,7 +58,6 @@ class _LetterDetailScreenState extends ConsumerState<LetterDetailScreen>
       });
       _controller.forward();
       
-      // Odśwież listę wiadomości w tle
       ref.read(lettersProvider.notifier).loadLetters();
     } else if (mounted) {
       setState(() => _isOpening = false);

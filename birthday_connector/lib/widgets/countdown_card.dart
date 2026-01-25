@@ -6,24 +6,44 @@ class CountdownCard extends StatelessWidget {
 
   const CountdownCard({super.key, required this.event});
 
+  static const Map<String, IconData> _iconMap = {
+    'wb_twilight': Icons.wb_twilight,
+    'card_giftcard': Icons.card_giftcard,
+    'stars': Icons.stars,
+    'celebration': Icons.celebration,
+  };
+
   IconData _getIcon() {
-    switch (event.icon) {
-      case 'wb_sunny':
-        return Icons.wb_sunny;
-      case 'celebration':
-        return Icons.celebration;
-      case 'local_florist':
-        return Icons.local_florist;
-      default:
-        return Icons.event;
-    }
+    return _iconMap[event.icon] ?? Icons.event;
+  }
+
+  String _formatText(String text) {
+    if (text.isEmpty) return text;
+    return '${text[0].toUpperCase()}${text.substring(1)}';
+  }
+
+  String _getTimeUntil() {
+    final now = DateTime.now();
+    final dateNow = DateTime(now.year, now.month, now.day);
+    final dateEvent = DateTime(
+        event.eventDate.year, event.eventDate.month, event.eventDate.day);
+
+    final diff = dateEvent.difference(dateNow).inDays;
+
+    if (diff == 0) return 'Today!';
+    if (diff == 1) return 'Tomorrow';
+    if (diff < 0) return 'Past';
+    return 'in $diff days';
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final timeUntil = _getTimeUntil();
 
     return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -46,12 +66,14 @@ class CountdownCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.title,
+                    _formatText(event.title),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
                         ),
                   ),
-                  if (event.description != null) ...[
+                  if (event.description != null &&
+                      event.description!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       event.description!,
@@ -69,7 +91,7 @@ class CountdownCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      event.formattedTimeUntil,
+                      timeUntil,
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                             color: colorScheme.onSecondaryContainer,
                             fontWeight: FontWeight.w600,

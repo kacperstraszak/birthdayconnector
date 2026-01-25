@@ -163,7 +163,7 @@ class AuthNotifier extends Notifier<AuthState> {
         kUsernameCol: username.trim(),
         kEmailCol: email,
         kBirthDateCol:
-            formattedDate.toIso8601String().split('T')[0], // Format: YYYY-MM-DD
+            formattedDate.toIso8601String().split('T')[0],
       });
 
       state = state.copyWith(

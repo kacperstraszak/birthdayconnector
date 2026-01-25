@@ -1,3 +1,5 @@
+import 'package:birthday_connector/models/user_profile.dart';
+
 class BirthdayTwin {
   final String id;
   final String username;
@@ -5,6 +7,7 @@ class BirthdayTwin {
   final String? interests;
   final String? avatarUrl;
   final int age;
+  final String? iceBreakerQuestion;
 
   BirthdayTwin({
     required this.id,
@@ -13,27 +16,31 @@ class BirthdayTwin {
     this.interests,
     this.avatarUrl,
     required this.age,
+    this.iceBreakerQuestion,
   });
 
   factory BirthdayTwin.fromJson(Map<String, dynamic> json) {
     return BirthdayTwin(
-      id: json['id'],
-      username: json['username'],
-      bio: json['bio'],
-      interests: json['interests'],
-      avatarUrl: json['avatar_url'],
-      age: json['age'],
+      id: json['id'] as String,
+      username: json['username'] as String,
+      bio: json['bio'] as String?,
+      interests: json['interests'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
+      age: json['age'] is int ? json['age'] : int.tryParse(json['age'].toString()) ?? 0,
+      iceBreakerQuestion: json['ice_breaker_question'] as String?,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'username': username,
-      'bio': bio,
-      'interests': interests,
-      'avatar_url': avatarUrl,
-      'age': age,
-    };
+  UserProfile toUserProfile() {
+    return UserProfile(
+      id: id,
+      username: username,
+      email: '', 
+      birthDate: DateTime.now(), 
+      bio: bio,
+      interests: interests,
+      iceBreakerQuestion: iceBreakerQuestion,
+      createdAt: DateTime.now(),
+    );
   }
 }

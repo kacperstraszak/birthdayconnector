@@ -24,12 +24,28 @@ class UserProfile {
       id: json['id'] as String,
       username: json['username'] as String,
       email: json['email'] as String,
-      birthDate: DateTime.parse(json['birth_date'] as String),
+      birthDate: _parseDateTime(json['birth_date']),
       bio: json['bio'] as String?,
       interests: json['interests'] as String?,
       iceBreakerQuestion: json['ice_breaker_question'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: _parseDateTime(json['created_at']),
     );
+  }
+
+  static DateTime _parseDateTime(dynamic value) {
+    if (value == null) return DateTime.now(); 
+
+    if (value is DateTime) return value; 
+
+    if (value is String) {
+      try {
+        return DateTime.parse(value);
+      } catch (e) {
+        print('Błąd parsowania daty: $value');
+        return DateTime.now();
+      }
+    }
+    return DateTime.now();
   }
 
   UserProfile copyWith({

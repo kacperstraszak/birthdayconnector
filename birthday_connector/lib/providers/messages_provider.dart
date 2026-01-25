@@ -1,4 +1,5 @@
 import 'package:birthday_connector/models/letter.dart';
+import 'package:birthday_connector/utils/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -32,42 +33,10 @@ class LettersState {
 
 class LettersNotifier extends Notifier<LettersState> {
   SupabaseClient get _supabase => Supabase.instance.client;
-  RealtimeChannel? _lettersSubscription;
 
   @override
   LettersState build() {
-    _setupRealtimeSubscription();
     return LettersState();
-  }
-
-  void _setupRealtimeSubscription() {
-    final userId = _supabase.auth.currentUser?.id;
-    if (userId == null) return;
-
-    _lettersSubscription = _supabase
-        .channel('letters_channel')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
-          schema: 'public',
-          table: 'letters',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'recipient_id',
-            value: userId,
-          ),
-          callback: (payload) {
-            _handleNewLetter(payload.newRecord);
-          },
-        )
-        .subscribe();
-  }
-
-  void _handleNewLetter(Map<String, dynamic> record) {
-    final letter = Letter.fromJson(record);
-    final updatedReceived = [...state.receivedLetters, letter];
-    updatedReceived.sort((a, b) => b.sentAt.compareTo(a.sentAt));
-
-    state = state.copyWith(receivedLetters: updatedReceived);
   }
 
   Future<void> loadLetters() async {
@@ -77,33 +46,22 @@ class LettersNotifier extends Notifier<LettersState> {
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('User not authenticated');
 
-      // Load received letters
-      final receivedResponse = await _supabase
-          .from('letters')
-          .select('''
+      final receivedResponse = await _supabase.from('letters').select('''
             *,
-            sender:user_profiles!letters_sender_id_fkey(*)
-          ''')
-          .eq('recipient_id', userId)
-          .order('sent_at', ascending: false);
+            sender:$kProfilesTable!letters_sender_id_fkey(*)
+          ''').eq('recipient_id', userId).order('sent_at', ascending: false);
 
       final receivedLetters = (receivedResponse as List)
           .map((json) => Letter.fromJson(json))
           .toList();
 
-      // Load sent letters
-      final sentResponse = await _supabase
-          .from('letters')
-          .select('''
+      final sentResponse = await _supabase.from('letters').select('''
             *,
-            recipient:user_profiles!letters_recipient_id_fkey(*)
-          ''')
-          .eq('sender_id', userId)
-          .order('sent_at', ascending: false);
+            recipient:$kProfilesTable!letters_recipient_id_fkey(*)
+          ''').eq('sender_id', userId).order('sent_at', ascending: false);
 
-      final sentLetters = (sentResponse as List)
-          .map((json) => Letter.fromJson(json))
-          .toList();
+      final sentLetters =
+          (sentResponse as List).map((json) => Letter.fromJson(json)).toList();
 
       state = state.copyWith(
         receivedLetters: receivedLetters,
@@ -111,9 +69,10 @@ class LettersNotifier extends Notifier<LettersState> {
         isLoading: false,
       );
     } catch (e) {
+      print('CRITICAL ERROR loading letters: $e');
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to load letters: ${e.toString()}',
+        errorMessage: 'Error loading letters: $e',
       );
     }
   }
@@ -144,7 +103,7 @@ class LettersNotifier extends Notifier<LettersState> {
       return true;
     } catch (e) {
       state = state.copyWith(
-        errorMessage: 'Failed to send letter: ${e.toString()}',
+        errorMessage: 'Failed to send letter: $e',
       );
       return false;
     }
@@ -152,15 +111,11 @@ class LettersNotifier extends Notifier<LettersState> {
 
   Future<bool> openLetter(String letterId) async {
     try {
-      await _supabase
-          .from('letters')
-          .update({
-            'is_opened': true,
-            'opened_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', letterId);
+      await _supabase.from('letters').update({
+        'is_opened': true,
+        'opened_at': DateTime.now().toIso8601String(),
+      }).eq('id', letterId);
 
-      // Update local state
       final updatedReceived = state.receivedLetters.map((letter) {
         if (letter.id == letterId) {
           return Letter(
@@ -183,14 +138,10 @@ class LettersNotifier extends Notifier<LettersState> {
       state = state.copyWith(receivedLetters: updatedReceived);
       return true;
     } catch (e) {
-      state = state.copyWith(
-        errorMessage: 'Failed to open letter: ${e.toString()}',
-      );
+      print('Error opening letter: $e');
       return false;
     }
   }
-
-
 }
 
 final lettersProvider = NotifierProvider<LettersNotifier, LettersState>(() {

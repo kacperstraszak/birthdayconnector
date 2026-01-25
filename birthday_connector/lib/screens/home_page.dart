@@ -17,23 +17,11 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profileState = ref.read(profileProvider);
-      if (profileState.profile?.birthDate != null) {
-        ref.read(homeDataProvider.notifier).loadDataForDate(
-              profileState.profile!.birthDate,
-            );
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final profileState = ref.watch(profileProvider);
     final authState = ref.watch(authProvider);
     final homeDataState = ref.watch(homeDataProvider);
+    final colorScheme = Theme.of(context).colorScheme; 
 
     final birthDate = profileState.profile?.birthDate;
 
@@ -46,9 +34,16 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            Icon(Icons.error_outline, size: 48, color: colorScheme.error),
             const SizedBox(height: 16),
-            Text(profileState.errorMessage!),
+            Text(
+              profileState.errorMessage!,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
@@ -57,7 +52,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ref.read(profileProvider.notifier).loadProfile(userId);
                 }
               },
-              child: const Text('Retry'),
+              child: Text(
+                'Retry',
+                style: TextStyle(color: colorScheme.primary), 
+              ),
             ),
           ],
         ),
@@ -65,8 +63,11 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
 
     if (birthDate == null) {
-      return const Center(
-        child: Text('No profile data available'),
+      return Center(
+        child: Text(
+          'No profile data available',
+          style: TextStyle(color: colorScheme.onSurface),
+        ),
       );
     }
 
@@ -86,6 +87,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           children: [
             LifeStatisticsCard(birthDate: birthDate),
             const SizedBox(height: 24),
+            
             if (homeDataState.countdownEvents.isNotEmpty) ...[
               const _SectionHeader(
                 title: 'Upcoming Events',
@@ -100,6 +102,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               const SizedBox(height: 24),
             ],
+
             if (homeDataState.famousBirthdays.isNotEmpty) ...[
               const _SectionHeader(
                 title: 'Born on Your Birthday',
@@ -114,20 +117,17 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               const SizedBox(height: 24),
             ],
+
             if (homeDataState.historicalEvents.isNotEmpty) ...[
               const _SectionHeader(
                 title: 'Historical Events on Your Birthday',
                 icon: Icons.history_edu,
               ),
               const SizedBox(height: 12),
-              ...homeDataState.historicalEvents.map(
-                (event) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: HistoricalEventCard(event: event),
-                ),
-              ),
+              HistoricalEventCard(events: homeDataState.historicalEvents),
               const SizedBox(height: 24),
             ],
+
             if (homeDataState.isLoading)
               const Center(
                 child: Padding(
@@ -135,24 +135,24 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: CircularProgressIndicator(),
                 ),
               ),
+
             if (homeDataState.errorMessage != null)
               Card(
-                color: Theme.of(context).colorScheme.errorContainer,
+                color: colorScheme.errorContainer,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
                       Icon(
                         Icons.error_outline,
-                        color: Theme.of(context).colorScheme.onErrorContainer,
+                        color: colorScheme.onErrorContainer,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           homeDataState.errorMessage!,
                           style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onErrorContainer,
+                            color: colorScheme.onErrorContainer,
                           ),
                         ),
                       ),
@@ -178,18 +178,21 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Row(
       children: [
         Icon(
           icon,
           size: 24,
-          color: Theme.of(context).colorScheme.primary,
+          color: colorScheme.primary,
         ),
         const SizedBox(width: 8),
         Text(
           title,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface, 
               ),
         ),
       ],

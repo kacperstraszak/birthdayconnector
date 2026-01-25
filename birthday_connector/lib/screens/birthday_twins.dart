@@ -1,6 +1,6 @@
-import 'package:birthday_connector/models/user_profile.dart';
+import 'package:birthday_connector/models/birthday_twin.dart';
 import 'package:birthday_connector/providers/profile_provider.dart';
-import 'package:birthday_connector/providers/search_provider.dart';
+import 'package:birthday_connector/providers/search_twin_provider.dart';
 import 'package:birthday_connector/screens/write_letter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,13 +19,25 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profile = ref.read(profileProvider).profile;
-      if (profile != null) {
-        ref
-            .read(birthdayTwinsProvider.notifier)
-            .loadMyBirthdayTwins(profile.birthDate);
-      }
+      _loadTwins();
     });
+  }
+
+  Future<void> _loadTwins() async {
+    final profile = ref.read(profileProvider).profile;
+    if (profile != null) {
+      await ref
+          .read(birthdayTwinsProvider.notifier)
+          .loadMyBirthdayTwins(profile.birthDate);
+      
+      final state = ref.read(birthdayTwinsProvider);
+      if (state.errorMessage != null) {
+        print('RPC failed, trying direct query...');
+        await ref
+            .read(birthdayTwinsProvider.notifier)
+            .loadMyBirthdayTwinsDirectQuery(profile.birthDate);
+      }
+    }
   }
 
   @override
@@ -42,7 +54,6 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
       ),
       body: Column(
         children: [
-          // Header showing user's birthday
           if (myBirthDate != null)
             Container(
               width: double.infinity,
@@ -95,7 +106,6 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
 
           const Divider(height: 1),
 
-          // List of birthday twins
           Expanded(
             child: _buildTwinsList(twinsState, colorScheme),
           ),
@@ -112,16 +122,35 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
 
     if (twinsState.errorMessage != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: colorScheme.error),
-            const SizedBox(height: 16),
-            Text(
-              twinsState.errorMessage!,
-              style: TextStyle(color: colorScheme.error),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: colorScheme.error),
+              const SizedBox(height: 16),
+              Text(
+                'Oops! Something went wrong',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                twinsState.errorMessage!,
+                style: TextStyle(color: colorScheme.error),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _loadTwins,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Try Again'),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -162,14 +191,7 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () async {
-        final profile = ref.read(profileProvider).profile;
-        if (profile != null) {
-          await ref
-              .read(birthdayTwinsProvider.notifier)
-              .loadMyBirthdayTwins(profile.birthDate);
-        }
-      },
+      onRefresh: _loadTwins,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: twinsState.twins.length,
@@ -180,7 +202,9 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
             onWriteLetter: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => WriteLetterScreen(recipient: twin),
+                  builder: (context) => WriteLetterScreen(
+                    recipient: twin.toUserProfile(),
+                  ),
                 ),
               );
             },
@@ -192,7 +216,7 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
 }
 
 class _BirthdayTwinCard extends StatelessWidget {
-  final UserProfile twin;
+  final BirthdayTwin twin;
   final VoidCallback onWriteLetter;
 
   const _BirthdayTwinCard({
@@ -200,20 +224,10 @@ class _BirthdayTwinCard extends StatelessWidget {
     required this.onWriteLetter,
   });
 
-  int _calculateAge(DateTime birthDate) {
-    final today = DateTime.now();
-    int age = today.year - birthDate.year;
-    if (today.month < birthDate.month ||
-        (today.month == birthDate.month && today.day < birthDate.day)) {
-      age--;
-    }
-    return age;
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final age = _calculateAge(twin.birthDate);
+    final age = twin.age;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -229,7 +243,9 @@ class _BirthdayTwinCard extends StatelessWidget {
                   radius: 32,
                   backgroundColor: colorScheme.primaryContainer,
                   child: Text(
-                    twin.username[0].toUpperCase(),
+                    twin.username.isNotEmpty
+                        ? twin.username[0].toUpperCase()
+                        : '?',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -247,7 +263,7 @@ class _BirthdayTwinCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: colorScheme.onPrimaryContainer,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -294,11 +310,14 @@ class _BirthdayTwinCard extends StatelessWidget {
                       interest.trim(),
                       style: TextStyle(
                         fontSize: 12,
-                        color: colorScheme.onPrimaryContainer,
+                        color: colorScheme.onSecondaryContainer,
                       ),
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                    backgroundColor: colorScheme.secondaryContainer,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 0,
+                    ),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   );
                 }).toList(),

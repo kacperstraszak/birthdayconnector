@@ -2,81 +2,102 @@ import 'package:birthday_connector/models/historical_event.dart';
 import 'package:flutter/material.dart';
 
 class HistoricalEventCard extends StatelessWidget {
-  final HistoricalEvent event;
+  final List<HistoricalEvent> events;
 
-  const HistoricalEventCard({super.key, required this.event});
+  const HistoricalEventCard({super.key, required this.events});
 
-  Color _getCategoryColor(BuildContext context, String? category) {
-    final colorScheme = Theme.of(context).colorScheme;
-    switch (category) {
-      case 'science':
-        return Colors.blue;
-      case 'politics':
-        return Colors.red;
-      case 'culture':
-        return Colors.purple;
-      case 'technology':
-        return Colors.green;
-      case 'sports':
-        return Colors.orange;
-      default:
-        return colorScheme.primary;
+  String _formatText(String text) {
+    if (text.isEmpty) return text;
+    String formatted = text.replaceAll('_', ' ');
+    if (formatted.length > 1) {
+      return '${formatted[0].toUpperCase()}${formatted.substring(1)}';
     }
+    return formatted.toUpperCase();
   }
+
 
   @override
   Widget build(BuildContext context) {
-    final yearsAgo = DateTime.now().year - event.year!;
-    final categoryColor = _getCategoryColor(context, event.category);
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    if (events.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Text(
+              "No historical events for this date.",
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: events.map((event) {
+        final yearsAgo = DateTime.now().year - event.year;
+        
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: categoryColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.greenAccent.withValues(alpha: 0.2), 
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        event.year.toString(),
+                        style: const TextStyle(
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '$yearsAgo years ago',
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _formatText(event.title), 
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: colorScheme.onSurface,
                   ),
-                  child: Text(
-                    event.year.toString(),
+                ),
+                if (event.description.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatText(event.description),
                     style: TextStyle(
-                      color: categoryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                      fontSize: 14,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '$yearsAgo years ago',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
+                ],
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              event.title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              event.description!,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

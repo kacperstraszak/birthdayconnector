@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
 
-const kProfilesTable = 'profiles';
+const kProfilesTable = 'user_profiles';
 
 const kUserIdCol = 'id';
 const kUsernameCol = 'username';

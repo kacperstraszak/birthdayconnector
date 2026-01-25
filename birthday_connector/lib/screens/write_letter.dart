@@ -46,7 +46,6 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
     setState(() => _isSending = false);
 
     if (success) {
-      // Odśwież listę wiadomości
       await ref.read(lettersProvider.notifier).loadLetters();
       
       if (!mounted) return;
@@ -60,7 +59,7 @@ class _WriteLetterScreenState extends ConsumerState<WriteLetterScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context)..pop()..pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

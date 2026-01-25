@@ -109,31 +109,54 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
       return const Center(child: CircularProgressIndicator());
     }
 
+    if (state.errorMessage != null && state.receivedLetters.isEmpty) {
+      return _buildErrorView(state.errorMessage!, colorScheme);
+    }
+
     if (state.receivedLetters.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.mail_outline,
-              size: 80,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No Letters Yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
+      return RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(lettersProvider.notifier).loadLetters();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(), 
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6, 
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.mail_outline,
+                    size: 80,
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No Letters Yet',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Connect with your birthday twins!',
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 24),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      ref.read(lettersProvider.notifier).loadLetters();
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Check for new letters'),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Connect with your birthday twins!',
-              style: TextStyle(color: colorScheme.onSurfaceVariant),
-            ),
-          ],
+          ),
         ),
       );
     }
@@ -168,31 +191,54 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
       return const Center(child: CircularProgressIndicator());
     }
 
+    if (state.errorMessage != null && state.sentLetters.isEmpty) {
+      return _buildErrorView(state.errorMessage!, colorScheme);
+    }
+
     if (state.sentLetters.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.send,
-              size: 80,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No Sent Letters',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
+      return RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(lettersProvider.notifier).loadLetters();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(), 
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.send,
+                    size: 80,
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No Sent Letters',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Write your first letter!',
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 24),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      ref.read(lettersProvider.notifier).loadLetters();
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Refresh'),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Write your first letter!',
-              style: TextStyle(color: colorScheme.onSurfaceVariant),
-            ),
-          ],
+          ),
         ),
       );
     }
@@ -218,6 +264,53 @@ class _MessagesPageState extends ConsumerState<MessagesPage>
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildErrorView(String message, ColorScheme colorScheme) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        await ref.read(lettersProvider.notifier).loadLetters();
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: colorScheme.error),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Oops! Something went wrong.',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
+                      ref.read(lettersProvider.notifier).loadLetters();
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -254,7 +347,6 @@ class _LetterCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // Envelope icon
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -264,9 +356,7 @@ class _LetterCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      letter.isOpened
-                          ? Icons.mail_outline
-                          : Icons.mail,
+                      letter.isOpened ? Icons.mail_outline : Icons.mail,
                       color: isUnread
                           ? colorScheme.onPrimaryContainer
                           : colorScheme.onSurfaceVariant,
@@ -274,7 +364,6 @@ class _LetterCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
 
-                  // Letter info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,6 +378,7 @@ class _LetterCard extends StatelessWidget {
                                   fontWeight: isUnread
                                       ? FontWeight.bold
                                       : FontWeight.w600,
+                                  color: colorScheme.onSurface,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -327,7 +417,6 @@ class _LetterCard extends StatelessWidget {
                 ],
               ),
 
-              // Status indicator
               if (isReceived) ...[
                 const SizedBox(height: 12),
                 _LetterStatusBanner(letter: letter),
@@ -354,7 +443,6 @@ class _LetterStatusBannerState extends State<_LetterStatusBanner> {
   void initState() {
     super.initState();
     if (!widget.letter.canBeOpened) {
-      // Update every minute to show countdown
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) setState(() {});
       });
@@ -397,7 +485,8 @@ class _LetterStatusBannerState extends State<_LetterStatusBanner> {
         ),
         child: Row(
           children: [
-            Icon(Icons.lock_open, size: 16, color: colorScheme.onPrimaryContainer),
+            Icon(Icons.lock_open,
+                size: 16, color: colorScheme.onPrimaryContainer),
             const SizedBox(width: 8),
             Text(
               'Ready to open!',
@@ -421,7 +510,8 @@ class _LetterStatusBannerState extends State<_LetterStatusBanner> {
       ),
       child: Row(
         children: [
-          Icon(Icons.lock_clock, size: 16, color: colorScheme.onSecondaryContainer),
+          Icon(Icons.lock_clock,
+              size: 16, color: colorScheme.onSecondaryContainer),
           const SizedBox(width: 8),
           Text(
             'Opens in ${_formatDuration(timeLeft)}',
