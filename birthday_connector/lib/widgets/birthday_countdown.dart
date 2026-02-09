@@ -20,7 +20,7 @@ class BirthdayCountdownCard extends StatelessWidget {
 
     return Card(
       elevation: 6,
-      shadowColor: colorScheme.primary.withOpacity(0.3),
+      shadowColor: colorScheme.primary.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -50,8 +50,8 @@ class BirthdayCountdownCard extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: isToday
-                      ? colorScheme.onPrimary.withOpacity(0.2)
-                      : colorScheme.surface.withOpacity(0.3),
+                      ? colorScheme.onPrimary.withValues(alpha: 0.2)
+                      : colorScheme.surface.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -105,7 +105,7 @@ class BirthdayCountdownCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: colorScheme.surface.withOpacity(0.2),
+                    color: colorScheme.surface.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(

@@ -34,7 +34,6 @@ class HistoricalEvent {
         parsedDate = DateTime(year, month, day);
       }
     } catch (e) {
-      print('Error parsing event_date: ${json['event_date']} - $e');
       final month = int.tryParse(json['month']?.toString() ?? '1') ?? 1;
       final day = int.tryParse(json['day']?.toString() ?? '1') ?? 1;
       final year = int.tryParse(json['year']?.toString() ?? '2000') ?? 2000;

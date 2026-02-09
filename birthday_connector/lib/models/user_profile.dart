@@ -41,7 +41,6 @@ class UserProfile {
       try {
         return DateTime.parse(value);
       } catch (e) {
-        print('Błąd parsowania daty: $value');
         return DateTime.now();
       }
     }

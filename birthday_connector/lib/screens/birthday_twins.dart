@@ -32,7 +32,6 @@ class _BirthdayTwinsScreenState extends ConsumerState<BirthdayTwinsScreen> {
 
       final state = ref.read(birthdayTwinsProvider);
       if (state.errorMessage != null) {
-        print('RPC failed, trying direct query...');
         await ref
             .read(birthdayTwinsProvider.notifier)
             .loadMyBirthdayTwinsDirectQuery(profile.birthDate);

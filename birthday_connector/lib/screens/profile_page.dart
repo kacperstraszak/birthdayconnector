@@ -52,11 +52,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final notifier = ref.read(profileProvider.notifier);
     FocusScope.of(context).unfocus();
 
-    print('Saving profile...');
-    print('Bio: "${_bioController.text}"');
-    print('Interests: "${_interestsController.text}"');
-    print('Question: "${_questionController.text}"');
-
     await notifier.updateProfile(
       bio: _bioController.text,
       interests: _interestsController.text,
@@ -67,7 +62,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     final errorMessage = ref.read(profileProvider).errorMessage;
     if (errorMessage == null) {
-      print('Profile saved successfully!');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -80,7 +74,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ),
       );
     } else {
-      print('Error saving profile: $errorMessage');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),

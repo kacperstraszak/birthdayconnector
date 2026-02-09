@@ -37,13 +37,13 @@ class _LifeStatisticsCardState extends State<LifeStatisticsCard> {
 
   int get _secondsLived => _age.inSeconds;
   int get _minutesLived => _age.inMinutes;
-  int get _hoursLived => _age.inHours;
+  // int get _hoursLived => _age.inHours;
   int get _daysLived => _age.inDays;
-  int get _weeksLived => (_age.inDays / 7).floor();
-  int get _monthsLived => ((DateTime.now().year - widget.birthDate.year) * 12 +
-          DateTime.now().month -
-          widget.birthDate.month)
-      .toInt();
+  // int get _weeksLived => (_age.inDays / 7).floor();
+  // int get _monthsLived => ((DateTime.now().year - widget.birthDate.year) * 12 +
+          // DateTime.now().month -
+          // widget.birthDate.month)
+      // .toInt();
   int get _yearsLived => (_age.inDays / 365.25).floor();
 
   int get _heartbeats => (_secondsLived * 1.2).toInt(); // ~72 bpm average

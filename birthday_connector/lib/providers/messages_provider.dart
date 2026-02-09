@@ -138,7 +138,6 @@ class LettersNotifier extends Notifier<LettersState> {
       state = state.copyWith(receivedLetters: updatedReceived);
       return true;
     } catch (e) {
-      print('Error opening letter: $e');
       return false;
     }
   }

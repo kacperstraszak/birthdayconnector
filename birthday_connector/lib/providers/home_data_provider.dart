@@ -71,7 +71,6 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
       final day = normalizedDate.day;
 
       List<FamousBirthday> birthdays = [];
-      try {
         final birthdaysResponse = await _supabase.rpc(
           'get_famous_birthdays_for_date',
           params: {
@@ -82,7 +81,7 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
         );
 
         if (birthdaysResponse != null && birthdaysResponse is List) {
-          birthdays = (birthdaysResponse as List)
+          birthdays = birthdaysResponse
               .map((json) {
                 try {
                   return FamousBirthday.fromJson(json);
@@ -93,12 +92,8 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
               .whereType<FamousBirthday>()
               .toList();
         }
-      } catch (e) {
-        // Ignore error
-      }
 
       List<HistoricalEvent> events = [];
-      try {
         final eventsResponse = await _supabase.rpc(
           'get_historical_events_for_date',
           params: {
@@ -109,7 +104,7 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
         );
 
         if (eventsResponse != null && eventsResponse is List) {
-          events = (eventsResponse as List)
+          events = eventsResponse
               .map((json) {
                 try {
                   return HistoricalEvent.fromJson(json);
@@ -120,12 +115,8 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
               .whereType<HistoricalEvent>()
               .toList();
         }
-      } catch (e) {
-        // Ignore error
-      }
 
       List<CountdownEvent> countdowns = [];
-      try {
         final countdownResponse = await _supabase
             .from('countdown_events')
             .select()
@@ -133,7 +124,6 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
             .order('event_date', ascending: true)
             .limit(limit);
 
-        if (countdownResponse != null && countdownResponse is List) {
           countdowns = (countdownResponse as List)
               .map((json) {
                 try {
@@ -144,10 +134,6 @@ class HomeDataNotifier extends Notifier<HomeDataState> {
               })
               .whereType<CountdownEvent>()
               .toList();
-        }
-      } catch (e) {
-        // Ignore error
-      }
 
       state = state.copyWith(
         famousBirthdays: birthdays,
